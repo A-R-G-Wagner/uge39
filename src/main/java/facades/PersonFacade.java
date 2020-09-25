@@ -54,6 +54,9 @@ public class PersonFacade implements IPersonFacade {
         EntityManager em = emf.createEntityManager();
 
         Person deletedPerson = em.find(Person.class, id);
+        if (deletedPerson == null) {
+
+        }
         try {
             em.getTransaction().begin();
             em.remove(deletedPerson);
@@ -68,10 +71,14 @@ public class PersonFacade implements IPersonFacade {
     @Override
     public PersonDTO getPerson(int id) {
         EntityManager em = emf.createEntityManager();
+
+        Person foundPerson = em.find(Person.class, id);
+        if (foundPerson != null) {
+
+        }
         try {
 
-            Person personOBJ = em.find(Person.class, id);
-            return new PersonDTO(personOBJ);
+            return new PersonDTO(foundPerson);
         } finally {
             em.close();
         }
@@ -94,8 +101,11 @@ public class PersonFacade implements IPersonFacade {
     @Override
     public PersonDTO editPerson(PersonDTO p) {
         EntityManager em = emf.createEntityManager();
-        
+
         Person nyPersonData = em.find(Person.class, p.getId());
+        if (nyPersonData != null){
+            
+        }
         try {
             em.getTransaction().begin();
             nyPersonData.setFirstName(p.getFirstName());
@@ -103,12 +113,11 @@ public class PersonFacade implements IPersonFacade {
             nyPersonData.setPhone(p.getPhone());
             nyPersonData.setLastEdited();
             em.getTransaction().commit();
-            
+
             return new PersonDTO(nyPersonData);
         } finally {
             em.close();
         }
-
     }//editPerson
 
 }//class
