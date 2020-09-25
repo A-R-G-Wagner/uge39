@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -35,8 +36,8 @@ public class Person implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date created;
 
-    public Person() {
-    }
+    @ManyToOne
+    private Address address;
 
     public Person(String firstName, String lastName, String phone) {
         this.firstName = firstName;
@@ -44,6 +45,17 @@ public class Person implements Serializable {
         this.phone = phone;
         this.lastEdited = new Date();
         this.created = new Date();
+    }
+
+    public Person() {
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 
     public String getFirstName() {

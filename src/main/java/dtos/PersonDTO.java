@@ -12,6 +12,9 @@ public class PersonDTO {
     private String lastName;
     private String phone;
     private int id;
+    private String street;
+    private String city;
+    private int zip;
 
     public PersonDTO(Person person) {
         this.firstName = person.getFirstName();
