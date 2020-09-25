@@ -8,6 +8,7 @@ package facades;
 import dtos.PersonDTO;
 import dtos.PersonsDTO;
 import entities.Person;
+import exceptions.PersonNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -49,13 +50,13 @@ public class PersonFacade implements IPersonFacade {
     }//addPerson
 
     @Override
-    public PersonDTO deletePerson(int id) {
+    public PersonDTO deletePerson(int id) throws PersonNotFoundException {
 
         EntityManager em = emf.createEntityManager();
-
+        
         Person deletedPerson = em.find(Person.class, id);
         if (deletedPerson == null) {
-
+            throw new PersonNotFoundException("No person with provided id found");
         }
         try {
             em.getTransaction().begin();
@@ -69,11 +70,12 @@ public class PersonFacade implements IPersonFacade {
     }//deletePerson
 
     @Override
-    public PersonDTO getPerson(int id) {
+    public PersonDTO getPerson(int id) throws PersonNotFoundException {
         EntityManager em = emf.createEntityManager();
 
         Person foundPerson = em.find(Person.class, id);
-        if (foundPerson != null) {
+        if (foundPerson == null) {
+            throw new PersonNotFoundException("No person with provided id found");
 
         }
         try {
@@ -99,12 +101,12 @@ public class PersonFacade implements IPersonFacade {
     }//getAllPersons
 
     @Override
-    public PersonDTO editPerson(PersonDTO p) {
+    public PersonDTO editPerson(PersonDTO p) throws PersonNotFoundException {
         EntityManager em = emf.createEntityManager();
 
         Person nyPersonData = em.find(Person.class, p.getId());
-        if (nyPersonData != null){
-            
+        if (nyPersonData == null) {
+            throw new PersonNotFoundException("No person with provided id found");
         }
         try {
             em.getTransaction().begin();
