@@ -7,12 +7,15 @@ package facades;
 
 import dtos.PersonDTO;
 import dtos.PersonsDTO;
+import entities.Address;
 import entities.Person;
+import exceptions.MissingInputException;
 import exceptions.PersonNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 /**
@@ -35,25 +38,45 @@ public class PersonFacade implements IPersonFacade {
         }
         return instance;
     }
-
+    
     @Override
-    public PersonDTO addPerson(String fName, String lName, String phone) {
+    public PersonDTO addPerson(String fName, String lName, String phone, String street, String city, int zip) throws MissingInputException {
+        if (fName.length() == 0) {
+            throw new MissingInputException("First name is missing");
+        }
+        if (lName.length() == 0) {
+            throw new MissingInputException("Last name is missing");
+        }
 
         EntityManager em = emf.createEntityManager();
-        Person p1 = new Person(fName, lName, phone);
+        Person p = new Person(fName, lName, phone);
 
-        em.getTransaction().begin();
-        em.persist(p1);
-        em.getTransaction().commit();
-
-        return new PersonDTO(p1);
-    }//addPerson
+        try {
+            em.getTransaction().begin();
+            Query q = em.createQuery("SELECT a FROM Address a WHERE a.street = :street AND a.city = :city AND a.zip = :zip");
+            q.setParameter("street", street);
+            q.setParameter("city", city);
+            q.setParameter("zip", zip);
+            List<Address> addressList = q.getResultList();
+            if (addressList.size() > 0) {
+                p.setAddress(addressList.get(0));
+            } else {
+                System.out.println("-------------make new address!------------");
+                p.setAddress(new Address(street, city, zip));
+            }
+            em.persist(p);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+        return new PersonDTO(p);
+    }
 
     @Override
     public PersonDTO deletePerson(int id) throws PersonNotFoundException {
 
         EntityManager em = emf.createEntityManager();
-        
+
         Person deletedPerson = em.find(Person.class, id);
         if (deletedPerson == null) {
             throw new PersonNotFoundException("No person with provided id found");
@@ -92,9 +115,10 @@ public class PersonFacade implements IPersonFacade {
         try {
 
             TypedQuery<Person> tq1 = em.createQuery("SELECT p FROM Person p", Person.class);
-            List<Person> personList = tq1.getResultList();
-
-            return new PersonsDTO(personList);
+//            List<Person> personList = tq1.getResultList();
+//
+//            return new PersonsDTO(personList);
+            return new PersonsDTO(tq1.getResultList());
         } finally {
             em.close();
         }

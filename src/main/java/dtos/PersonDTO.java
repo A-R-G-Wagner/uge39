@@ -20,7 +20,9 @@ public class PersonDTO {
         this.firstName = person.getFirstName();
         this.lastName = person.getLastName();
         this.phone = person.getPhone();
-        this.id = person.getId();
+        this.street = person.getAddress().getStreet();
+        this.city = person.getAddress().getCity();
+        this.zip = person.getAddress().getZip();
     }
 
     public String getFirstName() {
@@ -55,6 +57,28 @@ public class PersonDTO {
         this.id = id;
     }
 
-    
-    
+    public String getStreet() {
+        return street;
+    }
+
+    public void setStreet(String street) {
+        this.street = street;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public int getZip() {
+        return zip;
+    }
+
+    public void setZip(int zip) {
+        this.zip = zip;
+    }
+
 }
